@@ -4,13 +4,7 @@ tracker:
   api_key: $LINEAR_API_KEY
   active_states:
     - Todo
-    - In Progress
-    - In Review
-    - Ready for Testing
-    - In Testing
     - Rework
-    - ERD- WIP
-    - In Dev Testing
     - Review Failed
   terminal_states:
     - Done
@@ -170,10 +164,14 @@ Changes: [1-2 sentence summary]
 Ready for testing: Yes
 ```
 
+12. **CRITICAL: Move the ticket to "Ready for Testing" state in Linear.** Use the Linear GraphQL API or `linear_graphql` tool to transition the issue. If you cannot move the state, post a comment asking for it to be moved. The ticket MUST leave the "In Progress" state or Symphony will re-dispatch an agent on it.
+
 ### On failure
-- Tests fail → one repair pass → if still failing, post failure summary and stop
-- Missing context → post clarification request on ticket and stop
-- Timeout → post status update on ticket and stop
+- Tests fail → one repair pass → if still failing, move ticket to "Review Failed" and post failure summary
+- Missing context → post clarification request on ticket and move to "Rework"
+- Timeout → post status update on ticket and move to "Review Failed"
+
+**IMPORTANT:** Always move the ticket out of active states (Todo, Rework, Review Failed) when done. If you opened a PR → "Ready for Testing". If you failed → "Review Failed". Never leave a ticket in an active state.
 
 ## Team → Repo mapping
 
