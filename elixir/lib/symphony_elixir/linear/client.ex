@@ -10,8 +10,8 @@ defmodule SymphonyElixir.Linear.Client do
   @max_error_body_log_bytes 1_000
 
   @query """
-  query SymphonyLinearPoll($projectSlug: String!, $stateNames: [String!]!, $first: Int!, $relationFirst: Int!, $after: String) {
-    issues(filter: {project: {slugId: {eq: $projectSlug}}, state: {name: {in: $stateNames}}}, first: $first, after: $after) {
+  query SymphonyLinearPoll($stateNames: [String!]!, $first: Int!, $relationFirst: Int!, $after: String) {
+    issues(filter: {state: {name: {in: $stateNames}}}, first: $first, after: $after) {
       nodes {
         id
         identifier
@@ -112,9 +112,6 @@ defmodule SymphonyElixir.Linear.Client do
       is_nil(tracker.api_key) ->
         {:error, :missing_linear_api_token}
 
-      is_nil(project_slug) ->
-        {:error, :missing_linear_project_slug}
-
       true ->
         with {:ok, assignee_filter} <- routing_assignee_filter() do
           do_fetch_by_states(project_slug, tracker.active_states, assignee_filter)
@@ -135,9 +132,6 @@ defmodule SymphonyElixir.Linear.Client do
       cond do
         is_nil(tracker.api_key) ->
           {:error, :missing_linear_api_token}
-
-        is_nil(project_slug) ->
-          {:error, :missing_linear_project_slug}
 
         true ->
           do_fetch_by_states(project_slug, normalized_states, nil)
@@ -236,14 +230,13 @@ defmodule SymphonyElixir.Linear.Client do
     end
   end
 
-  defp do_fetch_by_states(project_slug, state_names, assignee_filter) do
-    do_fetch_by_states_page(project_slug, state_names, assignee_filter, nil, [])
+  defp do_fetch_by_states(_project_slug, state_names, assignee_filter) do
+    do_fetch_by_states_page(state_names, assignee_filter, nil, [])
   end
 
-  defp do_fetch_by_states_page(project_slug, state_names, assignee_filter, after_cursor, acc_issues) do
+  defp do_fetch_by_states_page(state_names, assignee_filter, after_cursor, acc_issues) do
     with {:ok, body} <-
            graphql(@query, %{
-             projectSlug: project_slug,
              stateNames: state_names,
              first: @issue_page_size,
              relationFirst: @issue_page_size,
@@ -254,7 +247,7 @@ defmodule SymphonyElixir.Linear.Client do
 
       case next_page_cursor(page_info) do
         {:ok, next_cursor} ->
-          do_fetch_by_states_page(project_slug, state_names, assignee_filter, next_cursor, updated_acc)
+          do_fetch_by_states_page(state_names, assignee_filter, next_cursor, updated_acc)
 
         :done ->
           {:ok, finalize_paginated_issues(updated_acc)}
