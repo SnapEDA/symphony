@@ -177,7 +177,7 @@ Ready for testing: Yes
 
 If the ticket doesn't specify a repo, use the team default:
 - GTM, FEA, TEC, TEC2, ALL, USER, QAP, DES, WIP2 → `snapeda` (Django monolith)
-- COR → `ai-circuit-design-ui` (Next.js web app)
+- COR → `snapeda` (most Core tickets are about the main site; designer tickets should specify `ai-circuit-design-ui` in description)
 - APP → `snapmagic-copilot-desktop` (Desktop app)
 - CAD3 → `cad-model-automation` (CAD pipeline)
 - DAT → `analytics-fetcher` (Analytics)
