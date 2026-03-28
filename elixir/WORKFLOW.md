@@ -2,7 +2,6 @@
 tracker:
   kind: linear
   api_key: $LINEAR_API_KEY
-  project_slug: "snapmagic"
   active_states:
     - Todo
     - In Progress
